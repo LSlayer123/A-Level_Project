@@ -1,6 +1,7 @@
 # Importing libraries
 import pygame
 from pygame.locals import *
+import sys
 
 # Initialising Pygame
 pygame.init()
@@ -29,13 +30,19 @@ class Entity:
         pass
 
 
+class Player(Entity):
+    def __init__(self, HPMax, MPMax, Strength, Magic, Defence, Resistance, Speed):
+        super().__init__(HPMax, MPMax, Strength, Magic, Defence, Resistance, Speed)
+
+
 # Opening Screen for the Game
 def main_Menu():
     while True:
 
         for event in pygame.event.get():
             if event.type == QUIT:
-                pygame.QUIT()
+                pygame.quit()
+                sys.exit()
 
         clock.tick(60)
 
