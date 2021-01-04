@@ -56,7 +56,9 @@ def button(start_x, start_y, width, height, function):
         pygame.mouse.set_cursor(*pygame.cursors.diamond)
         pygame.draw.rect(world, (150, 255, 0), (start_x, start_y, width, height))
         if click[0]:
-            function()
+            event = pygame.event.wait()
+            if event.type == pygame.MOUSEBUTTONUP:
+                function()
     else:
         pygame.draw.rect(world, (0, 255, 0), (start_x, start_y, width, height))
 
@@ -69,8 +71,6 @@ def redraw_World():
         world.blit(titleScreen, bg)
     elif gameState == 1:
         world.blit(mainScreen, bg)
-    else:
-        pass
 
 
 # Opening Screen for the Game
@@ -112,7 +112,7 @@ def main_Menu():
 def main_Game():
     global gameState, world, fullscreen
     gameState = 1
-    while True:
+    while gameState == 1:
 
         redraw_World()
         pygame.mouse.set_cursor(*pygame.cursors.arrow)
@@ -131,6 +131,9 @@ def main_Game():
                         world = pygame.display.set_mode(monitor_dimensions, pygame.FULLSCREEN)
                     else:
                         world = pygame.display.set_mode((world.get_width(), world.get_height()), pygame.SCALED)
+
+        pygame.display.update()
+        clock.tick(60)
 
 
 # Save Game
