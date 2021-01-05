@@ -65,21 +65,30 @@ def button(start_x, start_y, width, height, function):
 
 
 # Function for changing the resolution of the screen
-def change_Resolution(height, width):
-    global world
-    world = pygame.display.set_mode([height, width])
+def change_Resolution():
+    global world, mouse
+    if 200 <= mouse[1] <= 250:
+        world = pygame.display.set_mode([640, 480])
+    elif 300 <= mouse[1] <= 350:
+        world = pygame.display.set_mode([1280, 720])
+    else:
+        world = pygame.display.set_mode([1920, 1080])
 
 
 # Function for redrawing the graphics in the game
 def redraw_World():
+    global titleScreen, mainScreen, optionScreen
     world.fill((0, 0, 0))
     bg = world.get_rect()
     if gameState == 0:
-        world.blit(titleScreen, bg)
+        titleScreenCopy = pygame.transform.scale(titleScreen, (bg[2], bg[3]))
+        world.blit(titleScreenCopy, bg)
     elif gameState == 1:
-        world.blit(mainScreen, bg)
+        mainScreenCopy = pygame.transform.scale(mainScreen, (bg[2], bg[3]))
+        world.blit(mainScreenCopy, bg)
     elif gameState == 2:
-        world.blit(optionScreen, bg)
+        optionScreenCopy = pygame.transform.scale(optionScreen, (bg[2], bg[3]))
+        world.blit(optionScreenCopy, bg)
 
 
 # Opening Screen for the Game
@@ -152,16 +161,19 @@ def load_Game():
 
 # Options Menu
 def options():
-    global gameState, world
+    global gameState, world, mouse, click
     gameState = 2
     while gameState == 2:
+
+        mouse = pygame.mouse.get_pos()
+        click = pygame.mouse.get_pressed(num_buttons=5)
 
         redraw_World()
         pygame.mouse.set_cursor(*pygame.cursors.arrow)
 
-        button(100, 200, 100, 50, change_Resolution(640, 480))
-        button(100, 300, 100, 50, change_Resolution(1280, 720))
-        button(100, 400, 100, 50, change_Resolution(1920, 1080))
+        button(100, 200, 100, 50, change_Resolution)
+        button(100, 300, 100, 50, change_Resolution)
+        button(100, 400, 100, 50, change_Resolution)
 
         for event in pygame.event.get():
             if event.type == QUIT:
