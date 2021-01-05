@@ -13,13 +13,14 @@ pygame.display.set_caption("Game")
 clock = pygame.time.Clock()
 
 monitor_dimensions = [pygame.display.Info().current_w, pygame.display.Info().current_h]
-fullscreen = False
 
 # Loading Images
 titleScreen = pygame.image.load('Images/Title Screen.png')
 mainScreen = pygame.image.load('Images/UI.png')
+optionScreen = pygame.image.load('Images/OPTION.png')
 titleScreen.convert()
 mainScreen.convert()
+optionScreen.convert()
 
 # Defining variables for the mouse and clicks
 mouse = pygame.mouse.get_pos()
@@ -63,6 +64,12 @@ def button(start_x, start_y, width, height, function):
         pygame.draw.rect(world, (0, 255, 0), (start_x, start_y, width, height))
 
 
+# Function for changing the resolution of the screen
+def change_Resolution(height, width):
+    global world
+    world = pygame.display.set_mode([height, width])
+
+
 # Function for redrawing the graphics in the game
 def redraw_World():
     world.fill((0, 0, 0))
@@ -71,11 +78,13 @@ def redraw_World():
         world.blit(titleScreen, bg)
     elif gameState == 1:
         world.blit(mainScreen, bg)
+    elif gameState == 2:
+        world.blit(optionScreen, bg)
 
 
 # Opening Screen for the Game
 def main_Menu():
-    global mouse, click, fullscreen, world
+    global mouse, click, world
     while True:
 
         mouse = pygame.mouse.get_pos()
@@ -85,9 +94,8 @@ def main_Menu():
         pygame.mouse.set_cursor(*pygame.cursors.arrow)
 
         button(100, 200, 100, 50, main_Game)
-        button(100, 300, 100, 50, save_Game)
-        button(100, 400, 100, 50, load_Game)
-        button(100, 500, 100, 50, test)
+        button(100, 300, 100, 50, load_Game)
+        button(100, 400, 100, 50, options)
 
         for event in pygame.event.get():
             if event.type == QUIT:
@@ -98,11 +106,7 @@ def main_Menu():
                     pygame.quit()
                     sys.exit()
                 if event.key == K_f:
-                    fullscreen = not fullscreen
-                    if fullscreen:
-                        world = pygame.display.set_mode(monitor_dimensions, pygame.FULLSCREEN)
-                    else:
-                        world = pygame.display.set_mode((world.get_width(), world.get_height()), pygame.SCALED)
+                    pygame.display.toggle_fullscreen()
 
         pygame.display.update()
         clock.tick(60)
@@ -110,7 +114,7 @@ def main_Menu():
 
 # Main game state
 def main_Game():
-    global gameState, world, fullscreen
+    global gameState, world
     gameState = 1
     while gameState == 1:
 
@@ -126,11 +130,7 @@ def main_Game():
                     pygame.quit()
                     sys.exit()
                 if event.key == K_f:
-                    fullscreen = not fullscreen
-                    if fullscreen:
-                        world = pygame.display.set_mode(monitor_dimensions, pygame.FULLSCREEN)
-                    else:
-                        world = pygame.display.set_mode((world.get_width(), world.get_height()), pygame.SCALED)
+                    pygame.display.toggle_fullscreen()
 
         pygame.display.update()
         clock.tick(60)
@@ -139,17 +139,44 @@ def main_Game():
 # Save Game
 def save_Game():
     global gameState
-    gameState = 2
+    gameState = 3
     pass
 
 
 # Load Game
 def load_Game():
+    global gameState
+    gameState = 4
     pass
 
 
 # Options Menu
 def options():
+    global gameState, world
+    gameState = 2
+    while gameState == 2:
+
+        redraw_World()
+        pygame.mouse.set_cursor(*pygame.cursors.arrow)
+
+        button(100, 200, 100, 50, change_Resolution(640, 480))
+        button(100, 300, 100, 50, change_Resolution(1280, 720))
+        button(100, 400, 100, 50, change_Resolution(1920, 1080))
+
+        for event in pygame.event.get():
+            if event.type == QUIT:
+                pygame.quit()
+                sys.exit()
+            if event.type == KEYDOWN:
+                if event.key == K_ESCAPE:
+                    pygame.quit()
+                    sys.exit()
+                if event.key == K_f:
+                    pygame.display.toggle_fullscreen()
+
+        pygame.display.update()
+        clock.tick(60)
+
     pass
 
 
