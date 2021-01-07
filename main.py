@@ -22,10 +22,11 @@ titleScreen.convert()
 mainScreen.convert()
 optionScreen.convert()
 
-# Defining variables for the mouse and clicks
+# Defining variables for the mouse and clicks and base game state
 mouse = pygame.mouse.get_pos()
 click = pygame.mouse.get_pressed(num_buttons=5)
 gameState = 0
+smallFont = pygame.font.SysFont('Arial', 23)
 
 
 # Creating the main class for entities in the game
@@ -52,7 +53,7 @@ class Player(Entity):
 
 
 # Function for creating buttons
-def button(start_x, start_y, width, height, function):
+def button(start_x, start_y, width, height, function, text):
     if start_x + width > mouse[0] > start_x and start_y + height > mouse[1] > start_y:
         pygame.mouse.set_cursor(*pygame.cursors.diamond)
         pygame.draw.rect(world, (150, 255, 0), (start_x, start_y, width, height))
@@ -62,6 +63,8 @@ def button(start_x, start_y, width, height, function):
                 function()
     else:
         pygame.draw.rect(world, (0, 255, 0), (start_x, start_y, width, height))
+    title = smallFont.render(text, True, (0, 0, 255))
+    world.blit(title, ((start_x), (start_y + (height/2))))
 
 
 # Function for changing the resolution of the screen
@@ -102,9 +105,9 @@ def main_Menu():
         redraw_World()
         pygame.mouse.set_cursor(*pygame.cursors.arrow)
 
-        button(100, 200, 100, 50, main_Game)
-        button(100, 300, 100, 50, load_Game)
-        button(100, 400, 100, 50, options)
+        button(100, 200, 100, 50, main_Game, 'Start')
+        button(100, 300, 100, 50, load_Game, 'Continue?')
+        button(100, 400, 100, 50, options, 'Options')
 
         for event in pygame.event.get():
             if event.type == QUIT:
@@ -171,9 +174,9 @@ def options():
         redraw_World()
         pygame.mouse.set_cursor(*pygame.cursors.arrow)
 
-        button(100, 200, 100, 50, change_Resolution)
-        button(100, 300, 100, 50, change_Resolution)
-        button(100, 400, 100, 50, change_Resolution)
+        button(100, 200, 100, 50, change_Resolution, "640 x 480")
+        button(100, 300, 100, 50, change_Resolution, "1280 x 720")
+        button(100, 400, 100, 50, change_Resolution, "1920 x 1080")
 
         for event in pygame.event.get():
             if event.type == QUIT:
@@ -198,3 +201,4 @@ def test():
 
 
 main_Menu()
+
