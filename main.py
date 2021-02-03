@@ -19,7 +19,6 @@ titleScreen = pygame.image.load('Images/Title Screen.png')
 mainScreen = pygame.image.load('Images/UI.png')
 titleScreen.convert()
 mainScreen.convert()
-optionScreen.convert()
 
 # Defining variables for the mouse and clicks and base game state
 mouse = pygame.mouse.get_pos()
