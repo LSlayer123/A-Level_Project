@@ -17,7 +17,6 @@ monitor_dimensions = [pygame.display.Info().current_w, pygame.display.Info().cur
 # Loading Images
 titleScreen = pygame.image.load('Images/Title Screen.png')
 mainScreen = pygame.image.load('Images/UI.png')
-optionScreen = pygame.image.load('Images/OPTION.png')
 titleScreen.convert()
 mainScreen.convert()
 optionScreen.convert()
@@ -98,7 +97,7 @@ def change_Resolution():
 
 # Function for redrawing the graphics in the game
 def redraw_World():
-    global titleScreen, mainScreen, optionScreen
+    global titleScreen, mainScreen
     world.fill((0, 0, 0))
     bg = world.get_rect()
     if gameState == 0:
@@ -107,9 +106,6 @@ def redraw_World():
     elif gameState == 1:
         mainScreenCopy = pygame.transform.scale(mainScreen, (bg[2], bg[3]))
         world.blit(mainScreenCopy, bg)
-    elif gameState == 2:
-        optionScreenCopy = pygame.transform.scale(optionScreen, (bg[2], bg[3]))
-        world.blit(optionScreenCopy, bg)
 
 
 # Opening Screen for the Game
@@ -177,39 +173,6 @@ def save_Game():
 def load_Game():
     global gameState
     gameState = 4
-    pass
-
-
-# Options Menu
-def options():
-    global gameState, world, mouse, click
-    gameState = 2
-    while gameState == 2:
-
-        mouse = pygame.mouse.get_pos()
-        click = pygame.mouse.get_pressed(num_buttons=5)
-
-        redraw_World()
-        pygame.mouse.set_cursor(*pygame.cursors.arrow)
-
-        button(100.0, 200.0, 100.0, 50.0, change_Resolution, "640 x 480")
-        button(100.0, 300.0, 100.0, 50.0, change_Resolution, "1280 x 720")
-        button(100.0, 400.0, 100.0, 50.0, change_Resolution, "1920 x 1080")
-
-        for event in pygame.event.get():
-            if event.type == QUIT:
-                pygame.quit()
-                sys.exit()
-            if event.type == KEYDOWN:
-                if event.key == K_ESCAPE:
-                    pygame.quit()
-                    sys.exit()
-                if event.key == K_f:
-                    pygame.display.toggle_fullscreen()
-
-        pygame.display.update()
-        clock.tick(60)
-
     pass
 
 
