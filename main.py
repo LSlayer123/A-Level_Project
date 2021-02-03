@@ -26,6 +26,7 @@ optionScreen.convert()
 mouse = pygame.mouse.get_pos()
 click = pygame.mouse.get_pressed(num_buttons=5)
 gameState = 0
+resolution = 1
 smallFont = pygame.font.SysFont('Arial', 23)
 largeFont = pygame.font.SysFont('Arial', 36)
 
@@ -74,13 +75,25 @@ def button(start_x, start_y, width, height, function, text):
 
 # Function for changing the resolution of the screen
 def change_Resolution():
-    global world, mouse, smallFont, largeFont
-    if 200 <= mouse[1] <= 250:
+    global world, mouse, smallFont, largeFont, resolution
+
+    if resolution < 2:
+        resolution += 1
+    else:
+        resolution = 0
+
+    if resolution == 0:
         world = pygame.display.set_mode([640, 480])
-    elif 300 <= mouse[1] <= 350:
+        smallFont = pygame.font.SysFont('Arial', 18)
+        largeFont = pygame.font.SysFont('Arial', 25)
+    elif resolution == 1:
         world = pygame.display.set_mode([1280, 720])
+        smallFont = pygame.font.SysFont('Arial', 23)
+        largeFont = pygame.font.SysFont('Arial', 36)
     else:
         world = pygame.display.set_mode([1920, 1080])
+        smallFont = pygame.font.SysFont('Arial', 28)
+        largeFont = pygame.font.SysFont('Arial', 47)
 
 
 # Function for redrawing the graphics in the game
@@ -112,7 +125,7 @@ def main_Menu():
 
         button(100.0, 200.0, 100.0, 50.0, main_Game, 'Start')
         button(100.0, 300.0, 100.0, 50.0, load_Game, 'Continue?')
-        button(100.0, 400.0, 100.0, 50.0, options, 'Options')
+        button(100.0, 400.0, 100.0, 50.0, change_Resolution, 'Toggle Resolution')
 
         for event in pygame.event.get():
             if event.type == QUIT:
