@@ -13,11 +13,14 @@ world = pygame.display.set_mode([1280, 720])
 pygame.display.set_caption("Game")
 clock = pygame.time.Clock()
 
-# Loading Images
-titleScreen = pygame.image.load('Images/Title Screen.png')
-mainScreen = pygame.image.load('Images/UI.png')
-titleScreen.convert()
-mainScreen.convert()
+# Loading Images and converting them
+titleScreen = pygame.image.load('Images/Title Screen.png').convert()
+mainScreen = pygame.image.load('Images/UI.png').convert()
+Blue = pygame.image.load('Images/Blue.png').convert()
+Green = pygame.image.load('Images/Green.png').convert()
+Orange = pygame.image.load('Images/Orange.png').convert()
+Red = pygame.image.load('Images/Red.png').convert()
+Yellow = pygame.image.load('Images/Yellow.png').convert()
 
 # Defining variables for the mouse and clicks and base game state
 mouse = pygame.mouse.get_pos()
@@ -63,7 +66,9 @@ def button(start_x, start_y, width, height, function, text):
         if click[0]:
             event = pygame.event.wait()
             if event.type == pygame.MOUSEBUTTONUP:
+                pygame.mouse.set_cursor(*pygame.cursors.arrow)
                 function()
+
     else:
         pygame.draw.rect(world, (0, 255, 0), (start_x, start_y, width, height))
     title = smallFont.render(text, True, (0, 0, 255))
@@ -108,7 +113,7 @@ def redraw_World():
 
 # Function for generating the layout of the floors in the game
 def generate_Floor():
-    layout = [[0, 0, 0, 0, 0], [0, 0, 0, 0, 0], [0, 0, 0, 0, 0]]
+    layout = [[0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0]]
     for i in range(len(layout)):
         for j in range(len(layout[i])):
             layout[i][j] = random.randint(2, 4)
@@ -116,34 +121,18 @@ def generate_Floor():
 
 
 # Function for rendering the map of the current floor on screen
-def render_Map():
-    pygame.draw.rect(world, [0, 0, 0], [17.5, 17, 40, 40], True)
-    pygame.draw.rect(world, [0, 0, 0], [17.5, 62, 40, 40], True)
-    pygame.draw.rect(world, [0, 0, 0], [17.5, 107, 40, 40], True)
+def render_Map(rooms):
+    for i in range(len(rooms)):
+        pygame.draw.rect(world, [204, 153, 255], [17.5, 62, 40, 40])
+        pygame.draw.rect(world, [204, 153, 255], [318.5, 62, 40, 40])
+        for j in range(len(rooms[i])):
+            if rooms[i][j] == 2:
+                pygame.draw.rect(world, [255, 165, 0], [60.5 + (j * 43), 17 + (i * 45), 40, 40])
+            elif rooms[i][j] == 3:
+                pygame.draw.rect(world, [255, 0, 0], [60.5 + (j * 43), 17 + (i * 45), 40, 40])
+            elif rooms[i][j] == 4:
+                pygame.draw.rect(world, [0, 0, 255], [60.5 + (j * 43), 17 + (i * 45), 40, 40])
 
-    pygame.draw.rect(world, [0, 0, 0], [60.5, 17, 40, 40], True)
-    pygame.draw.rect(world, [0, 0, 0], [60.5, 62, 40, 40], True)
-    pygame.draw.rect(world, [0, 0, 0], [60.5, 107, 40, 40], True)
-
-    pygame.draw.rect(world, [0, 0, 0], [103.5, 17, 40, 40], True)
-    pygame.draw.rect(world, [0, 0, 0], [103.5, 62, 40, 40], True)
-    pygame.draw.rect(world, [0, 0, 0], [103.5, 107, 40, 40], True)
-
-    pygame.draw.rect(world, [0, 0, 0], [146.5, 17, 40, 40], True)
-    pygame.draw.rect(world, [0, 0, 0], [146.5, 62, 40, 40], True)
-    pygame.draw.rect(world, [0, 0, 0], [146.5, 107, 40, 40], True)
-
-    pygame.draw.rect(world, [0, 0, 0], [189.5, 17, 40, 40], True)
-    pygame.draw.rect(world, [0, 0, 0], [189.5, 62, 40, 40], True)
-    pygame.draw.rect(world, [0, 0, 0], [189.5, 107, 40, 40], True)
-
-    pygame.draw.rect(world, [0, 0, 0], [232.5, 17, 40, 40], True)
-    pygame.draw.rect(world, [0, 0, 0], [232.5, 62, 40, 40], True)
-    pygame.draw.rect(world, [0, 0, 0], [232.5, 107, 40, 40], True)
-
-    pygame.draw.rect(world, [0, 0, 0], [275.5, 17, 40, 40], True)
-    pygame.draw.rect(world, [0, 0, 0], [275.5, 62, 40, 40], True)
-    pygame.draw.rect(world, [0, 0, 0], [275.5, 107, 40, 40], True)
 
 # Opening Screen for the Game
 def main_Menu():
@@ -179,12 +168,12 @@ def main_Menu():
 def main_Game():
     global gameState, world
     gameState = 1
+    floor = generate_Floor()
+    print(floor)
     while gameState == 1:
 
         redraw_World()
-        pygame.mouse.set_cursor(*pygame.cursors.arrow)
-
-        render_Map()
+        render_Map(floor)
 
         for event in pygame.event.get():
             if event.type == QUIT:
