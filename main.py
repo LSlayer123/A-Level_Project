@@ -2,6 +2,7 @@
 import pygame
 from pygame.locals import *
 import sys
+import random
 
 # Initialising Pygame and the mixer
 pygame.init()
@@ -11,8 +12,6 @@ pygame.mixer.pre_init(44100, -16, 2, 512)
 world = pygame.display.set_mode([1280, 720])
 pygame.display.set_caption("Game")
 clock = pygame.time.Clock()
-
-monitor_dimensions = [pygame.display.Info().current_w, pygame.display.Info().current_h]
 
 # Loading Images
 titleScreen = pygame.image.load('Images/Title Screen.png')
@@ -107,6 +106,45 @@ def redraw_World():
         world.blit(mainScreenCopy, bg)
 
 
+# Function for generating the layout of the floors in the game
+def generate_Floor():
+    layout = [[0, 0, 0, 0, 0], [0, 0, 0, 0, 0], [0, 0, 0, 0, 0]]
+    for i in range(len(layout)):
+        for j in range(len(layout[i])):
+            layout[i][j] = random.randint(2, 4)
+    return layout
+
+
+# Function for rendering the map of the current floor on screen
+def render_Map():
+    pygame.draw.rect(world, [0, 0, 0], [17.5, 17, 40, 40], True)
+    pygame.draw.rect(world, [0, 0, 0], [17.5, 62, 40, 40], True)
+    pygame.draw.rect(world, [0, 0, 0], [17.5, 107, 40, 40], True)
+
+    pygame.draw.rect(world, [0, 0, 0], [60.5, 17, 40, 40], True)
+    pygame.draw.rect(world, [0, 0, 0], [60.5, 62, 40, 40], True)
+    pygame.draw.rect(world, [0, 0, 0], [60.5, 107, 40, 40], True)
+
+    pygame.draw.rect(world, [0, 0, 0], [103.5, 17, 40, 40], True)
+    pygame.draw.rect(world, [0, 0, 0], [103.5, 62, 40, 40], True)
+    pygame.draw.rect(world, [0, 0, 0], [103.5, 107, 40, 40], True)
+
+    pygame.draw.rect(world, [0, 0, 0], [146.5, 17, 40, 40], True)
+    pygame.draw.rect(world, [0, 0, 0], [146.5, 62, 40, 40], True)
+    pygame.draw.rect(world, [0, 0, 0], [146.5, 107, 40, 40], True)
+
+    pygame.draw.rect(world, [0, 0, 0], [189.5, 17, 40, 40], True)
+    pygame.draw.rect(world, [0, 0, 0], [189.5, 62, 40, 40], True)
+    pygame.draw.rect(world, [0, 0, 0], [189.5, 107, 40, 40], True)
+
+    pygame.draw.rect(world, [0, 0, 0], [232.5, 17, 40, 40], True)
+    pygame.draw.rect(world, [0, 0, 0], [232.5, 62, 40, 40], True)
+    pygame.draw.rect(world, [0, 0, 0], [232.5, 107, 40, 40], True)
+
+    pygame.draw.rect(world, [0, 0, 0], [275.5, 17, 40, 40], True)
+    pygame.draw.rect(world, [0, 0, 0], [275.5, 62, 40, 40], True)
+    pygame.draw.rect(world, [0, 0, 0], [275.5, 107, 40, 40], True)
+
 # Opening Screen for the Game
 def main_Menu():
     global mouse, click, world
@@ -146,6 +184,8 @@ def main_Game():
         redraw_World()
         pygame.mouse.set_cursor(*pygame.cursors.arrow)
 
+        render_Map()
+
         for event in pygame.event.get():
             if event.type == QUIT:
                 pygame.quit()
@@ -181,4 +221,3 @@ def test():
 
 
 main_Menu()
-
