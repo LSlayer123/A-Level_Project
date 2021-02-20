@@ -242,9 +242,4 @@ def load_Game():
     pass
 
 
-# Test Function
-def test():
-    print("Hi")
-
-
 main_Menu()
