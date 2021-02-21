@@ -32,10 +32,12 @@ gameState = 0
 resolution = 1
 smallFont = pygame.font.SysFont('Arial', 23)
 largeFont = pygame.font.SysFont('Arial', 36)
-playerLocation = [-1, -1]
+playerLocation = []
 floor = [[0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0]]
 finalAttack = 0
 enemyFinalAttack = 0
+roomClear = False
+floorNumber = 0
 
 
 # --------------------------------CLASSES------------------------------------------------------------------------------#
@@ -137,7 +139,7 @@ def set_Background():
 
     if gameState == 0:
         frame.blit(titleScreen, bg)
-    elif gameState == 1:
+    elif gameState == 1 or gameState == 2:
         frame.blit(mainScreen, bg)
 
 
@@ -159,7 +161,7 @@ def generate_Floor():
 
 # Function for rendering the map of the current floor on screen
 def render_Map(rooms):
-    global playerLocation
+    global playerLocation, roomClear
 
     pygame.draw.rect(frame, [204, 153, 255], [17.5, 62, 40, 40])
     pygame.draw.rect(frame, [204, 153, 255], [318.5, 62, 40, 40])
@@ -168,7 +170,8 @@ def render_Map(rooms):
         for j in range(len(rooms[i])):
             if ((17.0 + (i * 45)) / 720) * world.get_height() + (40.0 / 720) * world.get_height() > mouse[1] > \
                     ((17.0 + (i * 45)) / 720) * world.get_height() and (((60.5 + (j * 43)) / 1280) * world.get_width())\
-                    + ((40.0 / 1280) * world.get_width()) > mouse[0] > (((60.5 + (j * 43)) / 1280) * world.get_width()):
+                    + ((40.0 / 1280) * world.get_width()) > mouse[0] > (((60.5 + (j * 43)) / 1280) * world.get_width())\
+                    and gameState == 1:
                 if rooms[i][j] == 2:
                     pygame.draw.rect(frame, [255, 165, 0], [60.5 + (j * 43), 17 + (i * 45), 40, 40], True)
                 elif rooms[i][j] == 3:
@@ -178,7 +181,7 @@ def render_Map(rooms):
 
                 if click[0] and playerLocation[1] == j - 1 and gameState == 1:
                     playerLocation = [i, j]
-                    print(playerLocation)
+                    roomClear = False
             else:
                 if rooms[i][j] == 2:
                     pygame.draw.rect(frame, [255, 165, 0], [60.5 + (j * 43), 17 + (i * 45), 40, 40])
@@ -239,13 +242,12 @@ def main_Menu():
 
 # Main game state
 def main_Game():
-    global gameState, world, mouse, click, playerLocation, floor
+    global gameState, world, mouse, click, playerLocation, floor, roomClear, floorNumber
     gameState = 1
 
     playerCharacter = characterCreation()
 
     floor = generate_Floor()
-    print(floor)
     playerLocation = [-1, -1]
 
     while gameState == 1:
@@ -267,6 +269,21 @@ def main_Game():
         playerMaxMana = smallFont.render(str(playerCharacter.MPMax), True, (0, 0, 0))
         frame.blit(playerMaxMana, (197.0, 629.0))
 
+        currentFloorNumber = largeFont.render(str(floorNumber), True, (0, 0, 0))
+        frame.blit(currentFloorNumber, (557.0, 75.0))
+
+        if not roomClear:
+            if floor[playerLocation[0]][playerLocation[1]] == 2 and playerLocation != [-1, -1]:
+                combat(playerCharacter, enemyCreation())
+            elif floor[playerLocation[0]][playerLocation[1]] == 3 and playerLocation != [-1, -1]:
+                roomClear = True
+            else:
+                roomClear = True
+        elif playerLocation[1] == 5:
+            floorNumber += 1
+            floor = generate_Floor()
+            playerLocation = [-1, -1]
+
         for event in pygame.event.get():
             if event.type == QUIT:
                 pygame.quit()
@@ -275,8 +292,6 @@ def main_Game():
                 if event.key == K_ESCAPE:
                     pygame.quit()
                     sys.exit()
-                if event.key == K_b:
-                    combat(playerCharacter, enemyCreation())
                 if event.key == K_f:
                     pygame.display.toggle_fullscreen()
 
@@ -287,13 +302,13 @@ def main_Game():
 
 # Function for the combat encounters in the game
 def combat(player, enemy):
-    global gameState, world, mouse, click, playerLocation, floor, finalAttack, enemyFinalAttack
+    global gameState, world, mouse, click, playerLocation, floor, finalAttack, enemyFinalAttack, roomClear, floorNumber
     basePlayerDefence = player.Defence
     baseEnemyDefence = enemy.Defence
     enemyDamageText = smallFont.render("", True, (0, 0, 0))
     playerDamageText = smallFont.render("", True, (0, 0, 0))
+    gameState = 2
     while enemy.HP > 0 and player.HP > 0:
-
         finalAttack = 0
         enemyFinalAttack = 0
 
@@ -332,6 +347,9 @@ def combat(player, enemy):
         enemyMaxHealth = smallFont.render(str(enemy.HPMax), True, (0, 0, 0))
         frame.blit(enemyMaxHealth, (492.0, 629.0))
 
+        currentFloorNumber = largeFont.render(str(floorNumber), True, (0, 0, 0))
+        frame.blit(currentFloorNumber, (557.0, 75.0))
+
         frame.blit(enemyDamageText, (17.5, 160.0))
         frame.blit(playerDamageText, (17.5, 180.0))
 
@@ -350,14 +368,14 @@ def combat(player, enemy):
             enemy.HP -= finalAttack
             enemyDamageText = smallFont.render("You did " + str(finalAttack) + " damage to " + enemy.Name, True,
                                                (0, 0, 0))
-
-            enemy.Attack()
-            enemyFinalAttack -= player.Defence
-            if enemyFinalAttack < 0:
-                enemyFinalAttack = 0
-            player.HP -= enemyFinalAttack
-            playerDamageText = smallFont.render("You took " + str(enemyFinalAttack) + " damage from " + enemy.Name,
-                                                True, (0, 0, 0))
+            if enemy.HP > 0:
+                enemy.Attack()
+                enemyFinalAttack -= player.Defence
+                if enemyFinalAttack < 0:
+                    enemyFinalAttack = 0
+                player.HP -= enemyFinalAttack
+                playerDamageText = smallFont.render("You took " + str(enemyFinalAttack) + " damage from " + enemy.Name,
+                                                    True, (0, 0, 0))
 
         player.Defence = basePlayerDefence
         enemy.Defence = baseEnemyDefence
@@ -365,6 +383,12 @@ def combat(player, enemy):
         redraw_World()
         pygame.display.update()
         clock.tick(60)
+
+    if enemy.HP <= 0:
+        gameState = 1
+        roomClear = True
+    else:
+        gameState = 0
 
 
 # Save Game
