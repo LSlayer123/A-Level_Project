@@ -38,6 +38,8 @@ finalAttack = 0
 enemyFinalAttack = 0
 roomClear = False
 floorNumber = 0
+startTime = 0
+endTime = 0
 
 
 # --------------------------------CLASSES------------------------------------------------------------------------------#
@@ -169,8 +171,8 @@ def render_Map(rooms):
     for i in range(len(rooms)):
         for j in range(len(rooms[i])):
             if ((17.0 + (i * 45)) / 720) * world.get_height() + (40.0 / 720) * world.get_height() > mouse[1] > \
-                    ((17.0 + (i * 45)) / 720) * world.get_height() and (((60.5 + (j * 43)) / 1280) * world.get_width())\
-                    + ((40.0 / 1280) * world.get_width()) > mouse[0] > (((60.5 + (j * 43)) / 1280) * world.get_width())\
+                    ((17.0 + (i * 45)) / 720) * world.get_height() and (((60.5 + (j * 43)) / 1280) * world.get_width()) \
+                    + ((40.0 / 1280) * world.get_width()) > mouse[0] > (((60.5 + (j * 43)) / 1280) * world.get_width()) \
                     and gameState == 1:
                 if rooms[i][j] == 2:
                     pygame.draw.rect(frame, [255, 165, 0], [60.5 + (j * 43), 17 + (i * 45), 40, 40], True)
@@ -201,15 +203,18 @@ def characterCreation():
 
 
 # Enemy Creation Function
-def enemyCreation():
-    enemy = Entity(50, 50, 7, 2, 2, 0, "Golbin")
+def enemyCreation(number=None):
+    if number == 1:
+        enemy = Entity(100, 50, 10, 0, 5, 0, "Troll")
+    else:
+        enemy = Entity(50, 50, 7, 2, 2, 2, "Golbin")
     return enemy
 
 
 # -------------------------------MAIN GAME FUNCTIONS-------------------------------------------------------------------#
 # Opening Screen for the Game
 def main_Menu():
-    global mouse, click, world
+    global mouse, click, world, startTime, endTime
     while True:
 
         mouse = pygame.mouse.get_pos()
@@ -222,6 +227,10 @@ def main_Menu():
         button(100.0, 200.0, 100.0, 50.0, main_Game, 'Start')
         button(100.0, 300.0, 100.0, 50.0, load_Game, 'Continue?')
         button(100.0, 400.0, 100.0, 50.0, change_Resolution, 'Toggle Resolution')
+
+        previousTime = smallFont.render("You're previous best attempt was " + str(endTime - startTime) +
+                                        " milliseconds long", True, (0, 0, 0))
+        frame.blit(previousTime, (100.0, 500.0))
 
         for event in pygame.event.get():
             if event.type == QUIT:
@@ -242,13 +251,15 @@ def main_Menu():
 
 # Main game state
 def main_Game():
-    global gameState, world, mouse, click, playerLocation, floor, roomClear, floorNumber
+    global gameState, world, mouse, click, playerLocation, floor, roomClear, floorNumber, startTime
     gameState = 1
 
     playerCharacter = characterCreation()
 
     floor = generate_Floor()
     playerLocation = [-1, -1]
+
+    startTime = pygame.time.get_ticks()
 
     while gameState == 1:
 
@@ -276,9 +287,22 @@ def main_Game():
             if floor[playerLocation[0]][playerLocation[1]] == 2 and playerLocation != [-1, -1]:
                 combat(playerCharacter, enemyCreation())
             elif floor[playerLocation[0]][playerLocation[1]] == 3 and playerLocation != [-1, -1]:
-                roomClear = True
-            else:
-                roomClear = True
+                combat(playerCharacter, enemyCreation(1))
+            elif floor[playerLocation[0]][playerLocation[1]] == 4 and playerLocation != [-1, -1]:
+                Effect = random.randint(0, 4)
+                if Effect == 0:
+                    playerCharacter.HP += 50
+                    roomClear = True
+                elif Effect == 1:
+                    playerCharacter.Strength += 2
+                    roomClear = True
+                elif Effect == 2:
+                    playerCharacter.Defence += 2
+                    roomClear = True
+                elif Effect == 3:
+                    combat(playerCharacter, enemyCreation())
+                elif Effect == 4:
+                    combat(playerCharacter, enemyCreation(1))
         elif playerLocation[1] == 5:
             floorNumber += 1
             floor = generate_Floor()
@@ -302,7 +326,8 @@ def main_Game():
 
 # Function for the combat encounters in the game
 def combat(player, enemy):
-    global gameState, world, mouse, click, playerLocation, floor, finalAttack, enemyFinalAttack, roomClear, floorNumber
+    global gameState, world, mouse, click, playerLocation, floor, finalAttack, enemyFinalAttack, roomClear, floorNumber\
+        , endTime
     basePlayerDefence = player.Defence
     baseEnemyDefence = enemy.Defence
     enemyDamageText = smallFont.render("", True, (0, 0, 0))
@@ -389,6 +414,7 @@ def combat(player, enemy):
         roomClear = True
     else:
         gameState = 0
+        endTime = pygame.time.get_ticks()
 
 
 # Save Game
