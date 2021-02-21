@@ -18,7 +18,7 @@ clock = pygame.time.Clock()
 
 # Loading Images and converting them
 titleScreen = pygame.image.load('Images/Title Screen.png').convert()
-mainScreen = pygame.transform.scale(pygame.image.load('Images/UI.png').convert(), (1280, 720))
+mainScreen = pygame.image.load('Images/UI.png').convert()
 Blue = pygame.image.load('Images/Blue.png').convert()
 Green = pygame.image.load('Images/Green.png').convert()
 Orange = pygame.image.load('Images/Orange.png').convert()
@@ -33,31 +33,60 @@ resolution = 1
 smallFont = pygame.font.SysFont('Arial', 23)
 largeFont = pygame.font.SysFont('Arial', 36)
 playerLocation = [-1, -1]
+floor = [[0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0]]
+finalAttack = 0
+enemyFinalAttack = 0
 
 
-# Creating the main class for entities in the game
+# --------------------------------CLASSES------------------------------------------------------------------------------#
 class Entity:
 
     # Initialising the Class and setting each instance's attributes
-    def __init__(self, HPMax, MPMax, Strength, Magic, Defence, Resistance, Speed):
-        self.HPMax, self.HP = HPMax
-        self.MPMax, self.MP = MPMax
+    def __init__(self, HPMax, MPMax, Strength, Magic, Defence, Resistance, Name):
+        self.HPMax = self.HP = HPMax
+        self.MPMax = self.MP = MPMax
         self.Strength = Strength
         self.Magic = Magic
         self.Defence = Defence
         self.Resistance = Resistance
-        self.Speed = Speed
+        self.Name = Name
 
-    # Attack function [WIP]
     def Attack(self):
+        global enemyFinalAttack
+        enemyFinalAttack = self.Strength
+
+    def Defend(self):
+        self.Defence += 5
         pass
 
 
 class Player(Entity):
-    def __init__(self, HPMax, MPMax, Strength, Magic, Defence, Resistance, Speed):
-        super().__init__(HPMax, MPMax, Strength, Magic, Defence, Resistance, Speed)
+    def __init__(self, HPMax, MPMax, Strength, Magic, Defence, Resistance, Name):
+        super().__init__(HPMax, MPMax, Strength, Magic, Defence, Resistance, Name)
+
+    def Attack(self):
+        global finalAttack
+        finalAttack = self.Strength
+
+    def Defend(self):
+        global finalAttack
+        finalAttack = -1
+        self.Defence += 5
+
+    def Ability1(self):
+        pass
+
+    def Ability2(self):
+        pass
+
+    def Ability3(self):
+        pass
+
+    def Ability4(self):
+        pass
 
 
+# ---------------------------------ADMIN FUNCTIONS---------------------------------------------------------------------#
 # Function for creating buttons
 def button(start_x, start_y, width, height, function, text):
     if ((start_x / 1280) * world.get_width()) + ((width / 1280) * world.get_width()) > mouse[0] > \
@@ -74,7 +103,7 @@ def button(start_x, start_y, width, height, function, text):
 
     else:
         pygame.draw.rect(frame, (0, 255, 0), (start_x, start_y, width, height))
-    title = smallFont.render(text, True, (0, 0, 255))
+    title = smallFont.render(text, True, (0, 0, 0))
     frame.blit(title, (start_x, (start_y + (height / 2))))
 
 
@@ -147,7 +176,7 @@ def render_Map(rooms):
                 elif rooms[i][j] == 4:
                     pygame.draw.rect(frame, [0, 0, 255], [60.5 + (j * 43), 17 + (i * 45), 40, 40], True)
 
-                if click[0] and playerLocation[1] == j-1 and gameState == 1:
+                if click[0] and playerLocation[1] == j - 1 and gameState == 1:
                     playerLocation = [i, j]
                     print(playerLocation)
             else:
@@ -162,6 +191,19 @@ def render_Map(rooms):
         pygame.draw.rect(frame, [0, 255, 0], [60.5 + (playerLocation[1] * 43), 17 + (playerLocation[0] * 45), 40, 40])
 
 
+# Character Creation Function
+def characterCreation():
+    User = Player(150, 50, 10, 10, 5, 5, "Player")
+    return User
+
+
+# Enemy Creation Function
+def enemyCreation():
+    enemy = Entity(50, 50, 7, 2, 2, 0, "Golbin")
+    return enemy
+
+
+# -------------------------------MAIN GAME FUNCTIONS-------------------------------------------------------------------#
 # Opening Screen for the Game
 def main_Menu():
     global mouse, click, world
@@ -197,12 +239,63 @@ def main_Menu():
 
 # Main game state
 def main_Game():
-    global gameState, world, mouse, click, playerLocation
+    global gameState, world, mouse, click, playerLocation, floor
     gameState = 1
+
+    playerCharacter = characterCreation()
+
     floor = generate_Floor()
     print(floor)
     playerLocation = [-1, -1]
+
     while gameState == 1:
+
+        mouse = pygame.mouse.get_pos()
+        click = pygame.mouse.get_pressed(num_buttons=5)
+
+        set_Background()
+        render_Map(floor)
+
+        pygame.mouse.set_cursor(*pygame.cursors.arrow)
+
+        playerHealth = smallFont.render(str(playerCharacter.HP), True, (0, 0, 0))
+        frame.blit(playerHealth, (76.0, 588.0))
+        playerMaxHealth = smallFont.render(str(playerCharacter.HPMax), True, (0, 0, 0))
+        frame.blit(playerMaxHealth, (197.0, 588.0))
+        playerMana = smallFont.render(str(playerCharacter.MP), True, (0, 0, 0))
+        frame.blit(playerMana, (76.0, 629.0))
+        playerMaxMana = smallFont.render(str(playerCharacter.MPMax), True, (0, 0, 0))
+        frame.blit(playerMaxMana, (197.0, 629.0))
+
+        for event in pygame.event.get():
+            if event.type == QUIT:
+                pygame.quit()
+                sys.exit()
+            if event.type == KEYDOWN:
+                if event.key == K_ESCAPE:
+                    pygame.quit()
+                    sys.exit()
+                if event.key == K_b:
+                    combat(playerCharacter, enemyCreation())
+                if event.key == K_f:
+                    pygame.display.toggle_fullscreen()
+
+        redraw_World()
+        pygame.display.update()
+        clock.tick(60)
+
+
+# Function for the combat encounters in the game
+def combat(player, enemy):
+    global gameState, world, mouse, click, playerLocation, floor, finalAttack, enemyFinalAttack
+    basePlayerDefence = player.Defence
+    baseEnemyDefence = enemy.Defence
+    enemyDamageText = smallFont.render("", True, (0, 0, 0))
+    playerDamageText = smallFont.render("", True, (0, 0, 0))
+    while enemy.HP > 0 and player.HP > 0:
+
+        finalAttack = 0
+        enemyFinalAttack = 0
 
         mouse = pygame.mouse.get_pos()
         click = pygame.mouse.get_pressed(num_buttons=5)
@@ -222,6 +315,52 @@ def main_Game():
                     sys.exit()
                 if event.key == K_f:
                     pygame.display.toggle_fullscreen()
+
+        playerHealth = smallFont.render(str(player.HP), True, (0, 0, 0))
+        frame.blit(playerHealth, (76.0, 588.0))
+        playerMaxHealth = smallFont.render(str(player.HPMax), True, (0, 0, 0))
+        frame.blit(playerMaxHealth, (197.0, 588.0))
+        playerMana = smallFont.render(str(player.MP), True, (0, 0, 0))
+        frame.blit(playerMana, (76.0, 629.0))
+        playerMaxMana = smallFont.render(str(player.MPMax), True, (0, 0, 0))
+        frame.blit(playerMaxMana, (197.0, 629.0))
+
+        enemyName = smallFont.render(str(enemy.Name), True, (0, 0, 0))
+        frame.blit(enemyName, (371.0, 588.0))
+        enemyHealth = smallFont.render(str(enemy.HP), True, (0, 0, 0))
+        frame.blit(enemyHealth, (371.0, 629.0))
+        enemyMaxHealth = smallFont.render(str(enemy.HPMax), True, (0, 0, 0))
+        frame.blit(enemyMaxHealth, (492.0, 629.0))
+
+        frame.blit(enemyDamageText, (17.5, 160.0))
+        frame.blit(playerDamageText, (17.5, 180.0))
+
+        button(740, 33, 140, 55, player.Attack, "Attack")
+        button(740, 92, 140, 55, player.Ability1, "Ability1")
+        button(740, 151, 140, 55, player.Ability2, "Ability2")
+        button(884, 33, 140, 55, player.Ability3, "Ability3")
+        button(884, 92, 140, 55, player.Ability4, "Ability4")
+        button(884, 151, 140, 55, player.Defend, "Defend")
+
+        if finalAttack != 0:
+
+            finalAttack -= enemy.Defence
+            if finalAttack < 0:
+                finalAttack = 0
+            enemy.HP -= finalAttack
+            enemyDamageText = smallFont.render("You did " + str(finalAttack) + " damage to " + enemy.Name, True,
+                                               (0, 0, 0))
+
+            enemy.Attack()
+            enemyFinalAttack -= player.Defence
+            if enemyFinalAttack < 0:
+                enemyFinalAttack = 0
+            player.HP -= enemyFinalAttack
+            playerDamageText = smallFont.render("You took " + str(enemyFinalAttack) + " damage from " + enemy.Name,
+                                                True, (0, 0, 0))
+
+        player.Defence = basePlayerDefence
+        enemy.Defence = baseEnemyDefence
 
         redraw_World()
         pygame.display.update()
