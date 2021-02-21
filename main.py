@@ -157,7 +157,7 @@ def generate_Floor():
     layout = [[0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0]]
     for i in range(len(layout)):
         for j in range(len(layout[i])):
-            layout[i][j] = random.randint(2, 4)
+            layout[i][j] = random.choice([2, 2, 2, 2, 3, 4])
     return layout
 
 
@@ -280,6 +280,15 @@ def main_Game():
         playerMaxMana = smallFont.render(str(playerCharacter.MPMax), True, (0, 0, 0))
         frame.blit(playerMaxMana, (197.0, 629.0))
 
+        playerStrength = smallFont.render("Strength: " + str(playerCharacter.Strength), True, (0, 0, 0))
+        frame.blit(playerStrength, (980.0, 275.0))
+        playerMagic = smallFont.render("Magic: " + str(playerCharacter.Magic), True, (0, 0, 0))
+        frame.blit(playerMagic, (980.0, 300.0))
+        playerDefence = smallFont.render("Defence: " + str(playerCharacter.Defence), True, (0, 0, 0))
+        frame.blit(playerDefence, (980.0, 325.0))
+        playerResistance = smallFont.render("Resistance: " + str(playerCharacter.Resistance), True, (0, 0, 0))
+        frame.blit(playerResistance, (980.0, 350.0))
+
         currentFloorNumber = largeFont.render(str(floorNumber), True, (0, 0, 0))
         frame.blit(currentFloorNumber, (557.0, 75.0))
 
@@ -364,6 +373,15 @@ def combat(player, enemy):
         frame.blit(playerMana, (76.0, 629.0))
         playerMaxMana = smallFont.render(str(player.MPMax), True, (0, 0, 0))
         frame.blit(playerMaxMana, (197.0, 629.0))
+
+        playerStrength = smallFont.render("Strength: " + str(player.Strength), True, (0, 0, 0))
+        frame.blit(playerStrength, (980.0, 275.0))
+        playerMagic = smallFont.render("Magic: " + str(player.Magic), True, (0, 0, 0))
+        frame.blit(playerMagic, (980.0, 300.0))
+        playerDefence = smallFont.render("Defence: " + str(player.Defence), True, (0, 0, 0))
+        frame.blit(playerDefence, (980.0, 325.0))
+        playerResistance = smallFont.render("Resistance: " + str(player.Resistance), True, (0, 0, 0))
+        frame.blit(playerResistance, (980.0, 350.0))
 
         enemyName = smallFont.render(str(enemy.Name), True, (0, 0, 0))
         frame.blit(enemyName, (371.0, 588.0))
