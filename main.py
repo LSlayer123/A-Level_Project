@@ -98,10 +98,10 @@ class Player(Entity):
             self.Class = "Mage"
 
         elif selection == "rogue":
-            self.Strength += 6
-            self.Magic += 5
-            self.Defence += 3
-            self.Resistance += 2
+            self.Strength += 17
+            self.Magic += 18
+            self.Defence += 17
+            self.Resistance += 18
             self.Class = "Rogue"
 
     def strengthUp(self):
@@ -343,10 +343,15 @@ def main_Menu():
 
         button(100.0, 200.0, 100.0, 50.0, main_Game, 'Start')
         button(100.0, 300.0, 100.0, 50.0, load_Game, 'Continue?')
-        button(100.0, 400.0, 100.0, 50.0, change_Resolution, 'Toggle Resolution')
+        button(100.0, 400.0, 150.0, 50.0, change_Resolution, 'Toggle Resolution')
 
-        previousTime = smallFont.render("You're previous best attempt was " + str(endTime - startTime) +
-                                        " milliseconds long", True, (0, 0, 0))
+        totalTime = endTime - startTime
+        seconds = int((totalTime / 1000) % 60)
+        minutes = int((totalTime / (1000 * 60)) % 60)
+        hours = int((totalTime / (1000 * 60 * 60)) % 60)
+        Time = str(hours) + ":" + str(minutes) + ":" + str(seconds)
+
+        previousTime = smallFont.render("You're previous attempt was " + Time, True, (0, 0, 0))
         frame.blit(previousTime, (100.0, 500.0))
 
         for event in pygame.event.get():
