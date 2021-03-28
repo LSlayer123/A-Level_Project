@@ -98,10 +98,10 @@ class Player(Entity):
             self.Class = "Mage"
 
         elif selection == "rogue":
-            self.Strength += 17
-            self.Magic += 18
-            self.Defence += 17
-            self.Resistance += 18
+            self.Strength += 6
+            self.Magic += 5
+            self.Defence += 5
+            self.Resistance += 4
             self.Class = "Rogue"
 
     def strengthUp(self):
