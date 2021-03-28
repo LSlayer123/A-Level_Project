@@ -416,6 +416,12 @@ def main_Game():
 
         frame.blit(updateText, (17.5, 545.0))
 
+        if playerCharacter.statPoints != 0:
+            button(1095, 275.0, 25, 20, playerCharacter.strengthUp, "")
+            button(1095, 300.0, 25, 20, playerCharacter.magicUp, "")
+            button(1095, 325.0, 25, 20, playerCharacter.defenceUp, "")
+            button(1095, 350.0, 25, 20, playerCharacter.resistanceUp, "")
+
         if not roomClear:
             if floor[playerLocation[0]][playerLocation[1]] == 2 and playerLocation != [-1, -1]:
                 combat(playerCharacter, enemyCreation())
@@ -443,6 +449,7 @@ def main_Game():
                     combat(playerCharacter, enemyCreation(1))
         elif playerLocation[1] == 5:
             floorNumber += 1
+            playerCharacter.statPoints += 1
             floor = generate_Floor()
             playerLocation = [-1, -1]
 
